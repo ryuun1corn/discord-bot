@@ -1,0 +1,48 @@
+require('dotenv').config();
+const fs = require('node:fs');
+const path = require('node:path');
+const { Client, IntentsBitField, Collection, Events } = require("discord.js");
+const iterateCommands = require("./utils.js");
+
+const client = new Client({ // Declare intents
+    intents: [
+        IntentsBitField.Flags.Guilds,
+        IntentsBitField.Flags.GuildMembers,
+        IntentsBitField.Flags.GuildMessages,
+        IntentsBitField.Flags.MessageContent,
+    ],
+});
+
+client.commands = new Collection(); // Get available commands
+iterateCommands().forEach(command => {
+    client.commands.set(command.data.name, command); 
+});
+
+client.once("ready", (e) => { // Online event text prompt
+    console.log(`${e.user.tag} is online.`);
+});
+
+client.on(Events.InteractionCreate, async interaction => { // Handle commands
+    if (!interaction.isChatInputCommand()) return;
+    
+    const command = interaction.client.commands.get(interaction.commandName);
+
+	if (!command) {
+        console.log(client.commands);
+		console.error(`No command matching ${interaction.commandName} was found.`);
+		return;
+	}
+
+	try {
+		await command.execute(interaction);
+	} catch (error) {
+		console.error(error);
+		if (interaction.replied || interaction.deferred) {
+			await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+		} else {
+			await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+		}
+	}
+});
+
+client.login(process.env.BOT_TOKEN);
