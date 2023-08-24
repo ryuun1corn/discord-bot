@@ -7,9 +7,8 @@ module.exports = {
 		.setName('kitty')
 		.setDescription('Get a random cat image.'),
 	async execute(interaction) {
-        await interaction.reply({content: "Searching for some pussy...", ephemeral: true});
-        const imgUrl = await loadImage({content: interaction.user.id, ephemeral: false});
-        await interaction.editReply(imgUrl);
+        const data = await loadImage(interaction.user.id);
+        await interaction.reply(data.url);
 	},
 };
 
@@ -27,7 +26,7 @@ async function loadImage(sub_id) {
 
     try {
         const response = await axios.get(_url, { headers });
-        return response.data[0].url; // Return the data
+        return response.data[0]; // Return the data
     } catch (err) {
         throw err; // Rethrow the error to handle it outside the function if needed
     }
