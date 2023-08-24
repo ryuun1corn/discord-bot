@@ -1,7 +1,7 @@
 require('dotenv').config();
 const fs = require('node:fs');
 const path = require('node:path');
-const { Client, IntentsBitField, Collection, Events } = require("discord.js");
+const { Client, IntentsBitField, Collection, Events, TextChannel } = require("discord.js");
 const iterateCommands = require("./utils.js");
 
 const client = new Client({ // Declare intents
@@ -35,11 +35,17 @@ client.on(Events.InteractionCreate, async interaction => { // Handle commands
 
 	try {
 		await command.execute(interaction);
-	} catch (error) {
-		console.error(error);
-		if (interaction.replied || interaction.deferred) {
+	} catch (error) { // For error handling
+		const errorChannel= await client.channels.fetch(process.env.ERROR_CHANNEL_ID);
+		await errorChannel.send({
+			content: `=====ERROR REPOT======\nError name: ${error.name}\nMessage: ${error.message}\nStack:
+			\`\`\`${error.stack}\`\`\`
+			`
+		}); 
+
+		if (interaction.replied || interaction.deferred) { // If message a message has already been sent
 			await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
-		} else {
+		} else { // If there was no message
 			await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 		}
 	}
