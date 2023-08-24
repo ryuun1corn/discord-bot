@@ -23,6 +23,7 @@ client.once("ready", (e) => { // Online event text prompt
 });
 
 client.on(Events.InteractionCreate, async interaction => { // Handle commands
+	const errorChannel= await client.channels.fetch(process.env.ERROR_CHANNEL_ID);
     if (!interaction.isChatInputCommand()) return;
     
     const command = interaction.client.commands.get(interaction.commandName);
@@ -36,7 +37,6 @@ client.on(Events.InteractionCreate, async interaction => { // Handle commands
 	try {
 		await command.execute(interaction);
 	} catch (error) { // For error handling
-		const errorChannel= await client.channels.fetch(process.env.ERROR_CHANNEL_ID);
 		await errorChannel.send({
 			content: `=====ERROR REPOT======\nError name: ${error.name}\nMessage: ${error.message}\nStack:
 			\`\`\`${error.stack}\`\`\`
