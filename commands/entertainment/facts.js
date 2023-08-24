@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { SlashCommandBuilder, userMention } = require('discord.js');
+const { SlashCommandBuilder } = require('discord.js');
 const axios = require('axios');
 
 module.exports = {
@@ -7,8 +7,9 @@ module.exports = {
 		.setName('facts')
 		.setDescription('Get a random fact.'),
 	async execute(interaction) {
+		await interaction.deferReply();
 		const res = await getFact();
-		await interaction.reply(res.data[0].fact);
+		await interaction.followUp(res.data[0].fact);
 	},
 };
 
