@@ -1,23 +1,22 @@
 require('dotenv').config();
 const { ApplicationCommandType, ContextMenuCommandBuilder } = require('discord.js');
 const axios = require('axios');
-const { underMaintenance, checkSnippet, getSnippet } = require("../../utils.js");
+const { maintenanceMessage, getSnippet } = require("../../utils.js");
 
 const languangesId = ["csharp", "c", "c++", "go", "rust", "python", "ruby", "java", "javascript"];
 
-module.exports = {
+module.exports = { 
 	data: new ContextMenuCommandBuilder()
 		.setName('Compile')
         .setType(ApplicationCommandType.Message),
 	async execute(interaction) {
-        const res = getSnippet(interaction.targetMessage.content);
-        if (res.code) {
-            console.log(getOutput(res.code).stdout);
+        await interaction.deferReply({ephemeral: true});
+        const data = getSnippet(interaction.targetMessage.content);
+        if (data.code) {
+            const res = await getOutput(data.code);
+            console.log(res.data.stdout[0].text);
         } 
-        underMaintenance(interaction);
-        // console.log(JSON.parse(`"${text}"`));
-        // const res = await getOutput("def test(a):\n    return a*a  \n\nprint(test(5))");
-        // await interaction.reply(res.data.stdout[0].text);
+        await interaction.followUp(maintenanceMessage());
 	},
 };
 
@@ -30,8 +29,6 @@ async function getOutput(text) {
                 "skipAsm": true,
                 "executorRequest": true,
             },
-            "tools": [],
-            "libraries": []
         },
         "filters": {
             "execute": true,
