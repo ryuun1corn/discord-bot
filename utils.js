@@ -71,13 +71,13 @@ function iterateCommands() { // Iterate through files
     return commands;
 }
 
-function underMaintenance(interaction) {
-    interaction.reply({content: "This command is currently under maintenance. Apologies for the inconvenience.", ephemeral: true});
+function maintenanceMessage() {
+    return {content: "This command is currently under maintenance. Apologies for the inconvenience.", ephemeral: true};
 }
 
 module.exports = {
     iterateCommands,
-    underMaintenance,
+    maintenanceMessage,
     handleError,
     initiateEvents,
     getSnippet
