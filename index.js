@@ -2,7 +2,7 @@ require('dotenv').config();
 const fs = require('node:fs');
 const path = require('node:path');
 const { Client, IntentsBitField, Collection, Events, TextChannel } = require("discord.js");
-const iterateCommands = require("./utils.js");
+const { iterateCommands } = require("./utils.js");
 
 const client = new Client({ // Declare intents
     intents: [
