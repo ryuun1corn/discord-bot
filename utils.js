@@ -2,6 +2,23 @@ require('dotenv').config();
 const fs = require("node:fs");
 const path = require("node:path");
 
+function getSnippet(text) { // Checking if there is a code snippet and get the language (if there's any)
+    const languangesId = ["csharp", "c", "c++", "go", "rust", "python", "ruby", "java", "javascript"];
+    const checkRegEx = /```([\s\S]*?)```/;
+    const match = text.match(checkRegEx);
+    let language = null, code=null;
+    if (match) {
+        code = match[1];
+        const lines = match[1].split('\n');
+        const lang = lines[0];
+        if (languangesId.includes(lang)) {
+            language = lang;
+            code = lines.slice(1).join('\n');
+        }
+    }
+    return {lang: language, code: code};
+}
+
 async function handleError(interaction, error) {
     const errorChannel = await interaction.client.channels.fetch(process.env.ERROR_CHANNEL_ID);
     let errorMessage = `=====ERROR REPOT======\n`+
@@ -55,12 +72,13 @@ function iterateCommands() { // Iterate through files
 }
 
 function underMaintenance(interaction) {
-    interaction.reply("This command is currently under maintenance. Apologies for the inconvenience.");
+    interaction.reply({content: "This command is currently under maintenance. Apologies for the inconvenience.", ephemeral: true});
 }
 
 module.exports = {
     iterateCommands,
     underMaintenance,
     handleError,
-    initiateEvents
+    initiateEvents,
+    getSnippet
 };
