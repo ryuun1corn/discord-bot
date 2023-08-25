@@ -1,5 +1,30 @@
+require('dotenv').config();
 const fs = require("node:fs");
 const path = require("node:path");
+
+async function handleError(interaction, error) {
+    const errorChannel = await interaction.client.channels.fetch(process.env.ERROR_CHANNEL_ID);
+    await errorChannel.send({
+        content: `=====ERROR REPOT======\nError name: ${error.name}\nMessage: ${error.message}\nStack:
+        \`\`\`${error.stack}\`\`\`
+        `
+    }); 
+}
+
+function initiateEvents(client) {
+    const eventsPath = path.join(__dirname, "events");
+    const eventsFolder = fs.readdirSync(eventsPath);
+
+    for (const events of eventsFolder) {
+        const filePath = path.join(eventsPath, events);
+        const event = require(filePath);
+        if (event.once) {
+            client.once(event.name, (...args) => event.execute(...args));
+        } else {
+            client.on(event.name, (...args) => event.execute(...args));
+        }
+    }
+}
 
 function iterateCommands() { // Iterate through files
     let commands=[];
@@ -32,5 +57,7 @@ function underMaintenance(interaction) {
 
 module.exports = {
     iterateCommands,
-    underMaintenance
+    underMaintenance,
+    handleError,
+    initiateEvents
 };
