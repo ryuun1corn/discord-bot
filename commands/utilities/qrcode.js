@@ -15,7 +15,7 @@ module.exports = {
 	async execute(interaction) {
         const text=interaction.options.getString('text');
         await interaction.reply({
-            content: `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(text)}`,
+            content: `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(text)}&size=300x300`,
         });
 	},
 };
