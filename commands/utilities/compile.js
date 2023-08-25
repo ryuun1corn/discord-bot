@@ -1,21 +1,19 @@
 require('dotenv').config();
-const { SlashCommandBuilder } = require('discord.js');
+const { ApplicationCommandType, ContextMenuCommandBuilder } = require('discord.js');
 const axios = require('axios');
-const { underMaintenance } = require("../../utils.js");
+const { underMaintenance, checkSnippet, getSnippet } = require("../../utils.js");
 
 const languangesId = ["csharp", "c", "c++", "go", "rust", "python", "ruby", "java", "javascript"];
 
 module.exports = {
-	data: new SlashCommandBuilder()
-		.setName('compile')
-		.setDescription('Shows the output of a snippet of code.')
-        .addStringOption(option => 
-            option
-                .setName("text")
-                .setDescription("The snippet to execute.")
-                .setRequired(true)),
+	data: new ContextMenuCommandBuilder()
+		.setName('Compile')
+        .setType(ApplicationCommandType.Message),
 	async execute(interaction) {
-        const text = interaction.options.getString('text');
+        const res = getSnippet(interaction.targetMessage.content);
+        if (res.code) {
+            console.log(getOutput(res.code).stdout);
+        } 
         underMaintenance(interaction);
         // console.log(JSON.parse(`"${text}"`));
         // const res = await getOutput("def test(a):\n    return a*a  \n\nprint(test(5))");
