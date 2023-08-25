@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Client, Collection, Events, GatewayIntentBits } = require("discord.js");
+const { Client, Collection, GatewayIntentBits } = require("discord.js");
 const { iterateCommands, initiateEvents } = require("./utils.js");
 
 const client = new Client({ // Declare intents
