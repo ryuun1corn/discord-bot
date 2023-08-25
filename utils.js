@@ -4,11 +4,14 @@ const path = require("node:path");
 
 async function handleError(interaction, error) {
     const errorChannel = await interaction.client.channels.fetch(process.env.ERROR_CHANNEL_ID);
-    await errorChannel.send({
-        content: `=====ERROR REPOT======\nError name: ${error.name}\nMessage: ${error.message}\nStack:
-        \`\`\`${error.stack}\`\`\`
-        `
-    }); 
+    let errorMessage = `=====ERROR REPOT======\n`+
+    `Command name: ${interaction.commandName}\n` +
+    `Command type: ${interaction.commandType}\n` +
+    `Invoked by: ${interaction.user.globalName}\n` +
+    `\nError name: ${error.name}\n` +
+    `Message: ${error.message}\n` + 
+    `Stack:\`\`\`${error.stack}\`\`\``; 
+    await errorChannel.send(errorMessage); 
 }
 
 function initiateEvents(client) {
