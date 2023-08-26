@@ -7,9 +7,9 @@ module.exports = {
 		.setName('kitty')
 		.setDescription('Get a random cat image.'),
 	async execute(interaction) {
-        await interaction.deferReply();
+        await interaction.reply({content: "Getting your kitty..."});
         const data = await loadImage(interaction.user.id);
-        await interaction.followUp(data.url);
+        await interaction.editReply(data.url);
 	},
 };
 

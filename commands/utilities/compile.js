@@ -10,18 +10,16 @@ module.exports = {
 		.setName('Compile')
         .setType(ApplicationCommandType.Message),
 	async execute(interaction) {
-        await interaction.deferReply({ephemeral: true});
-
         const data = getSnippet(interaction.targetMessage.content);
         if (!data.code) {
-            interaction.followUp("Couldn't find any code blocks.");
+            interaction.reply({content: "Couldn't find any code blocks.", ephemeral :true});
             return;
         }
 
         if (!data.lang) {
             langRow = new ActionRowBuilder()
                 .addComponents(getLanguagesSelect());
-            const langResponse = await interaction.followUp({content: "Select a language.", components: [langRow]});
+            const langResponse = await interaction.reply({content: "Select a language.", components: [langRow], ephemeral: true});
             try {
                 const tempLang = await langResponse.awaitMessageComponent({time: 20_000, componentType: ComponentType.StringSelect});
                 data.lang = tempLang.values[0];
@@ -37,14 +35,15 @@ module.exports = {
         
         let rowResponse;
 
-        if (interaction.deferred) {
-            rowResponse = await interaction.followUp({content: "Select a compiler", components: [compilerRow]});
+        if (interaction.componentType !== ComponentType.StringSelect) {
+            rowResponse = await interaction.reply({content: "Select a compiler", components: [compilerRow], ephemeral: true});
         } else {
-            rowResponse = await interaction.update({content: "Select a compiler", components: [compilerRow]});
+            rowResponse = await interaction.update({content: "Select a compiler", components: [compilerRow], ephemeral: true});
         }
         try {
             const tempCompiler = await rowResponse.awaitMessageComponent({time: 20_000, componentType: ComponentType.StringSelect});
             data.compiler = tempCompiler.values[0];
+            await tempCompiler.update({content: "Please wait...", components: []});
             interaction = tempCompiler;
         } catch (err) {
             rowResponse.editReply({ content: 'Confirmation not received within 20 seconds, cancelling', components: [] });
@@ -57,7 +56,7 @@ module.exports = {
             finalText += line.text + "\n";
         }
 
-        interaction.update({content: `Here are the results: \n\`\`\`${finalText||" "}\`\`\``, components: []});
+        await interaction.editReply({content: `Here are the results: \n\`\`\`${finalText||" "}\`\`\``, components: []});
 	},
 };
 

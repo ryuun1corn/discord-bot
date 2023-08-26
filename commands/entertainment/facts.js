@@ -19,7 +19,7 @@ module.exports = {
 				.setMinValue(0)
 				.setMaxValue(10)),
 	async execute(interaction) {
-		await interaction.deferReply();
+		await interaction.reply({content: "Grabbing some facts..."});
 
 		let amount = interaction.options.getInteger("amount") ?? 1;
 		const facts = await getFact(amount);
@@ -34,7 +34,7 @@ module.exports = {
 		);
 		finalStr = "";
 
-		await interaction.followUp({embeds: [resEmbed]});
+		await interaction.editReply({content: "", embeds: [resEmbed]});
 	},
 };
 
