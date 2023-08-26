@@ -16,7 +16,7 @@ function getSnippet(text) { // Checking if there is a code snippet and get the l
             code = lines.slice(1).join('\n');
         }
     }
-    return {lang: language, code: code};
+    return {lang: language, code: code, compiler: null};
 }
 
 async function handleError(interaction, error) {
