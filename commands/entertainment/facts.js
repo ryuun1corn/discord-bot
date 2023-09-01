@@ -1,6 +1,7 @@
 require('dotenv').config();
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const axios = require('axios');
+const { getWaitEmbed } = require('../../data/embeds');
 
 // Embeds
 const resEmbed = new EmbedBuilder()
@@ -16,10 +17,10 @@ module.exports = {
 			option
 				.setName("amount")
 				.setDescription("The number of facts")
-				.setMinValue(0)
+				.setMinValue(1)
 				.setMaxValue(10)),
 	async execute(interaction) {
-		await interaction.reply({content: "Grabbing some facts..."});
+		await interaction.reply({embeds: [getWaitEmbed(interaction)]});
 
 		let amount = interaction.options.getInteger("amount") ?? 1;
 		const facts = await getFact(amount);

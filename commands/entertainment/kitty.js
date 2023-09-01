@@ -1,15 +1,16 @@
 require('dotenv').config();
 const { SlashCommandBuilder } = require('discord.js');
 const axios = require('axios');
+const { getWaitEmbed } = require('../../data/embeds');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('kitty')
 		.setDescription('Get a random cat image.'),
 	async execute(interaction) {
-        await interaction.reply({content: "Getting your kitty..."});
+        await interaction.reply({embeds: [getWaitEmbed(interaction)]});
         const data = await loadImage(interaction.user.id);
-        await interaction.editReply(data.url);
+        await interaction.editReply({content: data.url, embeds: []});
 	},
 };
 

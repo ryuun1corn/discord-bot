@@ -2,25 +2,25 @@ require('dotenv').config();
 const { ApplicationCommandType, ContextMenuCommandBuilder, ActionRowBuilder, ComponentType } = require('discord.js');
 const axios = require('axios');
 const { getSnippet } = require("../../utils.js");
-const { getLanguagesSelect, getCompilerSelect } = require("../../components.js");
-const components = require('../../components.js');
+const { getLanguagesSelect, getCompilerSelect } = require("../../data/components.js");
+const { getWaitEmbed } = require('../../data/embeds.js');
 
 module.exports = { 
 	data: new ContextMenuCommandBuilder()
 		.setName('Compile')
         .setType(ApplicationCommandType.Message),
 	async execute(interaction) {
-        await interaction.reply({content: "Please wait...", ephemeral: true})
+        await interaction.reply({embeds: [getWaitEmbed(interaction)], ephemeral: true})
         const data = getSnippet(interaction.targetMessage.content);
         if (!data.code) {
-            interaction.editReply({content: "Couldn't find any code blocks.", ephemeral :true});
+            interaction.editReply({content: "Couldn't find any code blocks.", embeds: [], ephemeral :true});
             return;
         }
 
         if (!data.lang) {
             langRow = new ActionRowBuilder()
                 .addComponents(getLanguagesSelect());
-            const langResponse = await interaction.editReply({content: "Select a language.", components: [langRow], ephemeral: true});
+            const langResponse = await interaction.editReply({components: [langRow], embeds:[], ephemeral: true});
             try {
                 const tempLang = await langResponse.awaitMessageComponent({time: 20_000, componentType: ComponentType.StringSelect});
                 data.lang = tempLang.values[0];
@@ -37,15 +37,15 @@ module.exports = {
         let rowResponse;
 
         if (interaction.componentType !== ComponentType.StringSelect) {
-            rowResponse = await interaction.editReply({content: "Select a compiler", components: [compilerRow], ephemeral: true});
+            rowResponse = await interaction.editReply({components: [compilerRow], embeds: [], ephemeral: true});
         } else {
-            rowResponse = await interaction.update({content: "Select a compiler", components: [compilerRow], ephemeral: true});
+            rowResponse = await interaction.update({components: [compilerRow], ephemeral: true});
         }
         
         try {
             const tempCompiler = await rowResponse.awaitMessageComponent({time: 20_000, componentType: ComponentType.StringSelect});
             data.compiler = tempCompiler.values[0];
-            await tempCompiler.update({content: "Please wait...", components: []});
+            await tempCompiler.update({embeds: [getWaitEmbed(interaction)], components: []});
             interaction = tempCompiler;
         } catch (err) {
             interaction.editReply({ content: 'Confirmation not received within 20 seconds, cancelling', components: [] });
@@ -58,7 +58,7 @@ module.exports = {
             finalText += line.text + "\n";
         }
 
-        await interaction.editReply({content: `Here are the results: \n\`\`\`${finalText||" "}\`\`\``, components: []});
+        await interaction.editReply({content: `Here is the result: \n\`\`\`${finalText||" "}\`\`\``, embeds: [], components: []});
 	},
 };
 
