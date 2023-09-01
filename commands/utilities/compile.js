@@ -10,16 +10,17 @@ module.exports = {
 		.setName('Compile')
         .setType(ApplicationCommandType.Message),
 	async execute(interaction) {
+        await interaction.reply({content: "Please wait...", ephemeral: true})
         const data = getSnippet(interaction.targetMessage.content);
         if (!data.code) {
-            interaction.reply({content: "Couldn't find any code blocks.", ephemeral :true});
+            interaction.editReply({content: "Couldn't find any code blocks.", ephemeral :true});
             return;
         }
 
         if (!data.lang) {
             langRow = new ActionRowBuilder()
                 .addComponents(getLanguagesSelect());
-            const langResponse = await interaction.reply({content: "Select a language.", components: [langRow], ephemeral: true});
+            const langResponse = await interaction.editReply({content: "Select a language.", components: [langRow], ephemeral: true});
             try {
                 const tempLang = await langResponse.awaitMessageComponent({time: 20_000, componentType: ComponentType.StringSelect});
                 data.lang = tempLang.values[0];
@@ -36,17 +37,18 @@ module.exports = {
         let rowResponse;
 
         if (interaction.componentType !== ComponentType.StringSelect) {
-            rowResponse = await interaction.reply({content: "Select a compiler", components: [compilerRow], ephemeral: true});
+            rowResponse = await interaction.editReply({content: "Select a compiler", components: [compilerRow], ephemeral: true});
         } else {
             rowResponse = await interaction.update({content: "Select a compiler", components: [compilerRow], ephemeral: true});
         }
+        
         try {
             const tempCompiler = await rowResponse.awaitMessageComponent({time: 20_000, componentType: ComponentType.StringSelect});
             data.compiler = tempCompiler.values[0];
             await tempCompiler.update({content: "Please wait...", components: []});
             interaction = tempCompiler;
         } catch (err) {
-            rowResponse.editReply({ content: 'Confirmation not received within 20 seconds, cancelling', components: [] });
+            interaction.editReply({ content: 'Confirmation not received within 20 seconds, cancelling', components: [] });
             return;
         }
 
