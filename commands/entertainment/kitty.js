@@ -9,8 +9,12 @@ module.exports = {
 		.setDescription('Get a random cat image.'),
 	async execute(interaction) {
         await interaction.reply({embeds: [getWaitEmbed(interaction)]});
-        const data = await loadImage(interaction.user.id);
-        await interaction.editReply({content: data.url, embeds: []});
+        try {
+            const data = await loadImage(interaction.user.id);
+            await interaction.editReply({content: data.url, embeds: []});
+        } catch(error) {
+            throw error;
+        }
 	},
 };
 

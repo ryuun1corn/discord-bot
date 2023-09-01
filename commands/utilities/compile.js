@@ -10,11 +10,18 @@ module.exports = {
 		.setName('Compile')
         .setType(ApplicationCommandType.Message),
 	async execute(interaction) {
+        const originalInteraction = interaction;
+
         await interaction.reply({embeds: [getWaitEmbed(interaction)], ephemeral: true})
         const data = getSnippet(interaction.targetMessage.content);
         if (!data.code) {
-            interaction.editReply({content: "Couldn't find any code blocks.", embeds: [], ephemeral :true});
-            return;
+            throw {
+                name: "CodeBlockMissing",
+                message: "Couldn't find any code blocks.",
+                command: interaction.commandName,
+                author: interaction.user.globalName,
+                timestamp: new Date()
+            }
         }
 
         if (!data.lang) {
@@ -45,7 +52,7 @@ module.exports = {
         try {
             const tempCompiler = await rowResponse.awaitMessageComponent({time: 20_000, componentType: ComponentType.StringSelect});
             data.compiler = tempCompiler.values[0];
-            await tempCompiler.update({embeds: [getWaitEmbed(interaction)], components: []});
+            await tempCompiler.update({embeds: [getWaitEmbed(originalInteraction)], components: []});
             interaction = tempCompiler;
         } catch (err) {
             interaction.editReply({ content: 'Confirmation not received within 20 seconds, cancelling', components: [] });

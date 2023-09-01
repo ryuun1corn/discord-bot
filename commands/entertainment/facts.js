@@ -21,13 +21,16 @@ module.exports = {
 				.setMaxValue(10)),
 	async execute(interaction) {
 		await interaction.reply({embeds: [getWaitEmbed(interaction)]});
+		let finalStr = "";
 
 		let amount = interaction.options.getInteger("amount") ?? 1;
-		const facts = await getFact(amount);
-
-		let finalStr = "";
-		for (var i = 0; i < facts.data.length; i++) {
-			finalStr += `${i+1}. ` + facts.data[i].fact + ".\n\n";
+		try {
+			const facts = await getFact(amount);
+			for (var i = 0; i < facts.data.length; i++) {
+				finalStr += `${i+1}. ` + facts.data[i].fact + ".\n\n";
+			}
+		} catch(error) {
+			throw error;
 		}
 
 		resEmbed.addFields(
