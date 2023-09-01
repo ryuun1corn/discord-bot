@@ -20,7 +20,7 @@ module.exports = {
             handleError(interaction, error);
 
             if (interaction.replied || interaction.deferred) { // If message a message has already been sent
-                await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+                await interaction.editReply({ content: 'There was an error while executing this command!', ephemeral: true });
             } else { // If there was no message
                 await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
             }
