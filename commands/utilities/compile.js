@@ -10,7 +10,6 @@ module.exports = {
 		.setName('Compile')
         .setType(ApplicationCommandType.Message),
 	async execute(interaction) {
-        const originalInteraction = interaction;
 
         await interaction.reply({embeds: [getWaitEmbed(interaction)], ephemeral: true})
         const data = getSnippet(interaction.targetMessage.content);
@@ -18,20 +17,18 @@ module.exports = {
             throw {
                 name: "CodeBlockMissing",
                 message: "Couldn't find any code blocks.",
-                command: interaction.commandName,
-                author: interaction.user.globalName,
                 timestamp: new Date()
             }
         }
+        let tempLang = null;
 
         if (!data.lang) {
             langRow = new ActionRowBuilder()
                 .addComponents(getLanguagesSelect());
             const langResponse = await interaction.editReply({components: [langRow], embeds:[], ephemeral: true});
             try {
-                const tempLang = await langResponse.awaitMessageComponent({time: 20_000, componentType: ComponentType.StringSelect});
+                tempLang = await langResponse.awaitMessageComponent({time: 20_000, componentType: ComponentType.StringSelect});
                 data.lang = tempLang.values[0];
-                interaction = tempLang;
             } catch (err) {
                 interaction.editReply({ content: 'Confirmation not received within 20 seconds, cancelling', components: [] });
                 return;
@@ -43,16 +40,16 @@ module.exports = {
         
         let rowResponse;
 
-        if (interaction.componentType !== ComponentType.StringSelect) {
+        if (!tempLang) {
             rowResponse = await interaction.editReply({components: [compilerRow], embeds: [], ephemeral: true});
         } else {
-            rowResponse = await interaction.update({components: [compilerRow], ephemeral: true});
+            rowResponse = await tempLang.update({components: [compilerRow], ephemeral: true});
         }
         
         try {
             const tempCompiler = await rowResponse.awaitMessageComponent({time: 20_000, componentType: ComponentType.StringSelect});
             data.compiler = tempCompiler.values[0];
-            await tempCompiler.update({embeds: [getWaitEmbed(originalInteraction)], components: []});
+            await tempCompiler.update({embeds: [getWaitEmbed(interaction)], components: []});
             interaction = tempCompiler;
         } catch (err) {
             interaction.editReply({ content: 'Confirmation not received within 20 seconds, cancelling', components: [] });

@@ -19,7 +19,7 @@ function getSnippet(text) { // Checking if there is a code snippet and get the l
     return {lang: language, code: code, compiler: null};
 }
 
-async function handleError(interaction, error) {
+async function handleError(interaction, error) { // For logging to error channel
     const errorChannel = await interaction.client.channels.fetch(process.env.ERROR_CHANNEL_ID);
     let errorMessage = `=====ERROR REPOT======\n`+
     `Command name: ${interaction.commandName}\n` +
@@ -27,7 +27,7 @@ async function handleError(interaction, error) {
     `Invoked by: ${interaction.user.globalName}\n` +
     `\nError name: ${error.name}\n` +
     `Message: ${error.message}\n` + 
-    `Stack:\`\`\`${error.stack}\`\`\``; 
+    `Stack:\`\`\`${error.stack ?? "No stack was provided."}\`\`\``; 
     await errorChannel.send(errorMessage); 
 }
 

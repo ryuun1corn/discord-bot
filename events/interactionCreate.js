@@ -5,7 +5,7 @@ const { getErrorEmbed } = require('../data/embeds.js');
 module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction) {
-        if (!interaction.isChatInputCommand()&&!interaction.isMessageContextMenuCommand()) return;
+        if (!interaction.isChatInputCommand() && !interaction.isMessageContextMenuCommand()) return;
         
         const command = interaction.client.commands.get(interaction.commandName);
 
@@ -17,18 +17,15 @@ module.exports = {
 
         try {
             await command.execute(interaction);
-        } catch (error) { // For error handling
-            if (error.command) {
-                if (interaction.replied) await interaction.editReply({embeds: [getErrorEmbed(error)]});
-                return;
+        } catch (error) { // For error handling (still needs fixes)
+            if (error.stack) {
+                handleError(interaction, error);
             }
 
-            handleError(interaction, error);
-
             if (interaction.replied || interaction.deferred) { // If message a message has already been sent
-                await interaction.editReply({ content: 'There was an error while executing this command!', ephemeral: true });
+                await interaction.editReply({embeds: [getErrorEmbed(interaction, error)], ephemeral: true});
             } else { // If there was no message
-                await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+                await interaction.reply({embeds: [getErrorEmbed(interaction, error)], ephemeral: true});
             }
         }
     }

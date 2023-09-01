@@ -9,10 +9,10 @@ const waitEmbed = new EmbedBuilder()
     .setTitle("Waiting for reply")
     .setDescription("Please wait for a while...")
 
-function getErrorEmbed(error) {
+function getErrorEmbed(interaction, error) {
     errorEmbed
         .setDescription(error.message)
-        .setFooter({text: `${error.author} | '${error.command}' by urmom~`})
+        .setFooter({text: `${interaction.user.globalName} | '${interaction.commandName ?? "-"}' by urmom~`})
     return errorEmbed
 }
 
