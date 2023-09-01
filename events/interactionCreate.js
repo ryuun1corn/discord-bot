@@ -1,5 +1,6 @@
 const { Events } = require('discord.js');
-const { handleError } = require("../utils.js")
+const { handleError } = require("../utils.js");
+const { getErrorEmbed } = require('../data/embeds.js');
 
 module.exports = {
     name: Events.InteractionCreate,
@@ -17,6 +18,11 @@ module.exports = {
         try {
             await command.execute(interaction);
         } catch (error) { // For error handling
+            if (error.command) {
+                if (interaction.replied) await interaction.editReply({embeds: [getErrorEmbed(error)]});
+                return;
+            }
+
             handleError(interaction, error);
 
             if (interaction.replied || interaction.deferred) { // If message a message has already been sent

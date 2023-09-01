@@ -1,10 +1,20 @@
 const { EmbedBuilder } = require("discord.js");
 
+const errorEmbed = new EmbedBuilder()
+    .setColor(0xff0000)
+    .setTitle("An error occured.")
 
 const waitEmbed = new EmbedBuilder()
-    .setColor(0xf5500f)
+    .setColor(0xffff40)
     .setTitle("Waiting for reply")
     .setDescription("Please wait for a while...")
+
+function getErrorEmbed(error) {
+    errorEmbed
+        .setDescription(error.message)
+        .setFooter({text: `${error.author} | '${error.command}' by urmom~`})
+    return errorEmbed
+}
 
 function getWaitEmbed(interaction) {
     waitEmbed.setFooter({text: `${interaction.user.globalName} | '${interaction.commandName}' by urmom~`});
@@ -12,5 +22,6 @@ function getWaitEmbed(interaction) {
 }
 
 module.exports = {
-    getWaitEmbed
+    getWaitEmbed,
+    getErrorEmbed
 }
